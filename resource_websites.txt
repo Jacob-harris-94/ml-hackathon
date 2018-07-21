@@ -1,0 +1,3 @@
+http://mattermost.corp.idtus.com/hackathon/channels/town-square#
+
+https://www.dataquest.io/blog/web-scraping-beautifulsoup/
