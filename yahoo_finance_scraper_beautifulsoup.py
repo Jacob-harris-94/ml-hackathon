@@ -5,7 +5,7 @@ Created on Sat Jul 21 09:43:59 2018
 @author: etu
 """
 
-from lxml import html  
+from bs4 import BeautifulSoup
 import requests
 from time import sleep
 import json
@@ -17,8 +17,11 @@ def parse(ticker):
     response = requests.get(url, verify=False)
     print ("Parsing %s"%(url))
     sleep(4)
-    parser = html.fromstring(response.text)
-    summary_table = parser.xpath('//div[contains(@data-test,"summary-table")]//tr')
+    soup = BeautifulSoup(response.text, 'html.parser')
+    summary_table = soup.findAll("div", {"data-test":"summary-table"})
+    for hit in summary_table:    
+        print(hit.text)
+    #summary_table = parser.xpath('//div[contains(@data-test,"summary-table")]//tr')
     summary_data = OrderedDict()
     other_details_json_link = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/{0}?formatted=true&lang=en-US&region=US&modules=summaryProfile%2CfinancialData%2CrecommendationTrend%2CupgradeDowngradeHistory%2Cearnings%2CdefaultKeyStatistics%2CcalendarEvents&corsDomain=finance.yahoo.com".format(ticker)
     summary_json_response = requests.get(other_details_json_link)
@@ -32,8 +35,10 @@ def parse(ticker):
             datelist.append(i['fmt'])
         earnings_date = ' to '.join(datelist)
         for table_data in summary_table:
-            raw_table_key = table_data.xpath('.//td[contains(@class,"C(black)")]//text()')
-            raw_table_value = table_data.xpath('.//td[contains(@class,"Ta(end)")]//text()')
+            raw_table_key = table_data.findAll('td', {'class':"C(black)"})
+            raw_table_value = table_data.findAll('td', {'class':"Ta(end)"})
+            #raw_table_key = table_data.xpath('.//td[contains(@class,"C(black)")]//text()')
+            #raw_table_value = table_data.xpath('.//td[contains(@class,"Ta(end)")]//text()')
             table_key = ''.join(raw_table_key).strip()
             table_value = ''.join(raw_table_value).strip()
             summary_data.update({table_key:table_value})
