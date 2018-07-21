@@ -40,10 +40,10 @@ if __name__ == '__main__':
     # one of the shortest pages... only a few links to other pages!
     url = 'https://en.wikipedia.org/wiki/Helmeted_gecko'
     print(f'url: {url}')
-    text_and_links = get_text_and_hrefs_from_url_recursively(url, 1)
+    text_and_links = get_text_and_hrefs_from_url_recursively(url, 2)
     print("===================================================================")
 
-    print(text_and_links)
+    #print(text_and_links)
 
     #print(f'text_only: {text_and_links[0]}')
     #print("===================================================================")
