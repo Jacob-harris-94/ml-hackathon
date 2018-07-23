@@ -5,6 +5,7 @@ Created on Sat Jul 21 09:43:59 2018
 @author: etu
 """
 
+import re
 from bs4 import BeautifulSoup
 import requests
 from time import sleep
@@ -18,10 +19,9 @@ def parse(ticker):
     print ("Parsing %s"%(url))
     sleep(4)
     soup = BeautifulSoup(response.text, 'html.parser')
-    summary_table = soup.findAll("div", {"data-test":"summary-table"})
-    for hit in summary_table:    
-        print(hit.text)
-    #summary_table = parser.xpath('//div[contains(@data-test,"summary-table")]//tr')
+    summary_table = soup.findAll("div", {"data-test":re.compile(r'summary-table')})
+    #for hit in summary_table:    
+        #print(hit.prettify())
     summary_data = OrderedDict()
     other_details_json_link = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/{0}?formatted=true&lang=en-US&region=US&modules=summaryProfile%2CfinancialData%2CrecommendationTrend%2CupgradeDowngradeHistory%2Cearnings%2CdefaultKeyStatistics%2CcalendarEvents&corsDomain=finance.yahoo.com".format(ticker)
     summary_json_response = requests.get(other_details_json_link)
@@ -35,13 +35,20 @@ def parse(ticker):
             datelist.append(i['fmt'])
         earnings_date = ' to '.join(datelist)
         for table_data in summary_table:
-            raw_table_key = table_data.findAll('td', {'class':"C(black)"})
-            raw_table_value = table_data.findAll('td', {'class':"Ta(end)"})
-            #raw_table_key = table_data.xpath('.//td[contains(@class,"C(black)")]//text()')
-            #raw_table_value = table_data.xpath('.//td[contains(@class,"Ta(end)")]//text()')
-            table_key = ''.join(raw_table_key).strip()
-            table_value = ''.join(raw_table_value).strip()
-            summary_data.update({table_key:table_value})
+            raw_table_key=[]
+            raw_table_value=[]
+            for d in table_data.descendants:
+                if d.name == 'td':
+                    for dClass in d.get('class',''):
+                        if dClass == "C(black)":
+                            raw_table_key.append(d.text)
+                        if dClass == "Ta(end)":
+                            raw_table_value.append(d.text)
+                            table_key = ''.join(raw_table_key).strip()
+                            table_value = ''.join(raw_table_value).strip()
+                            summary_data.update({table_key:table_value})
+                            raw_table_key=[]
+                            raw_table_value=[]
         summary_data.update({'1y Target Est':y_Target_Est,'EPS (TTM)':eps,'Earnings Date':earnings_date,'ticker':ticker,'url':url})
         return summary_data
     except:
@@ -58,6 +65,3 @@ if __name__=="__main__":
     print ("Writing data to output file")
     with open('%s-summary.json'%(ticker), 'w') as fp:
         json.dump(scraped_data,fp,indent = 4)
-    
-    #with open('%s-summary.json'%(ticker),'w') as fp:
-        #json.dump(scraped_data,fp,indent = 4)
