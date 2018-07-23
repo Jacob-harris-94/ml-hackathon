@@ -63,5 +63,5 @@ if __name__=="__main__":
     print ("Fetching data for %s"%(ticker))
     scraped_data = parse(ticker)
     print ("Writing data to output file")
-    with open('%s-summary.json'%(ticker), 'w') as fp:
+    with open('outputs/%s-summary.json'%(ticker), 'w') as fp:
         json.dump(scraped_data,fp,indent = 4)
