@@ -2,3 +2,5 @@ http://mattermost.corp.idtus.com/hackathon/channels/town-square#
 
 https://www.dataquest.io/blog/web-scraping-beautifulsoup/
 https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+
+https://github.com/dwyl/english-words

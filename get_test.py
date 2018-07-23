@@ -1,7 +1,8 @@
 from requests import get
 from bs4 import BeautifulSoup
 
-url = 'https://en.wikipedia.org/wiki/Computer_security'
+#url = 'https://en.wikipedia.org/wiki/Computer_security'
+url = 'https://en.wikipedia.org/wiki/Helmeted_gecko'
 
 response = get(url)
 #print(response.text[:500])
