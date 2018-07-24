@@ -27,9 +27,7 @@ def parse(ticker):
         y_Target_Est = json_loaded_summary["quoteSummary"]["result"][0]["financialData"]["targetMeanPrice"]['raw']
         earnings_list = json_loaded_summary["quoteSummary"]["result"][0]["calendarEvents"]['earnings']
         eps = json_loaded_summary["quoteSummary"]["result"][0]["defaultKeyStatistics"]["trailingEps"]['raw']
-        datelist = []
-        for i in earnings_list['earningsDate']:
-            datelist.append(i['fmt'])
+        datelist = [i['fmt'] for i in earnings_list['earningsData']]
         earnings_date = ' to '.join(datelist)
         for table_data in summary_table:
             raw_table_key = table_data.xpath('.//td[contains(@class,"C(black)")]//text()')
