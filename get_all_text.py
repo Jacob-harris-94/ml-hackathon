@@ -1,5 +1,6 @@
 from requests import get
 from bs4 import BeautifulSoup
+import time
 
 visited_urls = set()
 
@@ -46,7 +47,10 @@ if __name__ == '__main__':
     # one of the shortest pages... only a few links to other pages!
     url = 'https://en.wikipedia.org/wiki/Helmeted_gecko'
     print(f'url: {url}')
+    start = time.time()
     text_and_links = get_text_and_hrefs_from_url_recursively(url, 2)
+    end = time.time()
+    print("Took about " + str(end-start) + " seconds to run")
     print("===================================================================")
 
     #print(text_and_links)
