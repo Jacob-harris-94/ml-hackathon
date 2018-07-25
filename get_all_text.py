@@ -8,9 +8,7 @@ def get_text_and_hrefs_from_url(url, print_url=False):
     html_soup = BeautifulSoup(response.text, 'html.parser')
     text_only = html_soup.get_text()
     anchors = html_soup.find_all('a')
-    urls = []
-    for anchor in anchors:
-        urls.append(anchor.get('href'))
+    urls = [anchor.get('href') for anchor in anchors]
     return [text_only, urls]
 
 def get_text_and_hrefs_from_url_recursively(url, n=0):
@@ -21,11 +19,8 @@ def get_text_and_hrefs_from_url_recursively(url, n=0):
         txt_urls_pair = get_text_and_hrefs_from_url(url, print_url=True)
         url_list = txt_urls_pair[1]
         print('url_list' + str(url_list))
-        txt_url_pairs =[]
-        for url in url_list:
-            if url != None and url[0:5+1] == '/wiki/':
-                url = url.replace('/wiki/', 'https://en.wikipedia.org/wiki/')
-                txt_url_pairs.append(get_text_and_hrefs_from_url_recursively(url, n-1))
+        url_list = [url.replace('/wiki/', 'https://en.wikipedia.org/wiki/') for url in url_list if url != None and url[0:5+1] == '/wiki/']
+        txt_url_pairs = [get_text_and_hrefs_from_url_recursively(url, n-1) for url in url_list]
         print(f'recursed {n} times')
         return txt_url_pairs
     else:

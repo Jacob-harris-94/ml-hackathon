@@ -26,8 +26,7 @@ def parse():
         if pageNum == 1:
             openMethod = 'w'
         with open('outputs/sbirTitles.txt', openMethod + '+') as f_out:
-            for hit in sbirTitles:
-                f_out.write(hit.text + '\n')
+            [f_out.write(hit.text + '\n') for hit in sbirTitles]
         pageNum = pageNum + 1
         sleep(0.25)
     

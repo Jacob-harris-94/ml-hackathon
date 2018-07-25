@@ -13,6 +13,9 @@ import json
 import argparse
 from collections import OrderedDict
 
+from multiprocessing import Pool
+from functools import partial
+
 def parse(ticker):
     url = "http://finance.yahoo.com/quote/%s?p=%s"%(ticker,ticker)
     response = requests.get(url, verify=False)
@@ -30,25 +33,24 @@ def parse(ticker):
         y_Target_Est = json_loaded_summary["quoteSummary"]["result"][0]["financialData"]["targetMeanPrice"]['raw']
         earnings_list = json_loaded_summary["quoteSummary"]["result"][0]["calendarEvents"]['earnings']
         eps = json_loaded_summary["quoteSummary"]["result"][0]["defaultKeyStatistics"]["trailingEps"]['raw']
-        datelist = []
-        for i in earnings_list['earningsDate']:
-            datelist.append(i['fmt'])
+        datelist = [i['fmt'] for i in earnings_list['earningsData']]
         earnings_date = ' to '.join(datelist)
+             
         for table_data in summary_table:
             raw_table_key=[]
             raw_table_value=[]
-            for d in table_data.descendants:
-                if d.name == 'td':
-                    for dClass in d.get('class',''):
-                        if dClass == "C(black)":
-                            raw_table_key.append(d.text)
-                        if dClass == "Ta(end)":
-                            raw_table_value.append(d.text)
-                            table_key = ''.join(raw_table_key).strip()
-                            table_value = ''.join(raw_table_value).strip()
-                            summary_data.update({table_key:table_value})
-                            raw_table_key=[]
-                            raw_table_value=[]
+            filtered_table_decendants = [d for d in table_data.descendants if d.name == 'td']
+            for d in filtered_table_decendants:
+                for dClass in d.get('class',''):
+                    if dClass == "C(black)":
+                        raw_table_key.append(d.text)
+                    if dClass == "Ta(end)":
+                        raw_table_value.append(d.text)
+                        table_key = ''.join(raw_table_key).strip()
+                        table_value = ''.join(raw_table_value).strip()
+                        summary_data.update({table_key:table_value})
+                        raw_table_key=[]
+                        raw_table_value=[]
         summary_data.update({'1y Target Est':y_Target_Est,'EPS (TTM)':eps,'Earnings Date':earnings_date,'ticker':ticker,'url':url})
         return summary_data
     except:
